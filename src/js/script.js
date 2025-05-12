@@ -24,7 +24,7 @@ const createModal = (imgUrl) => {
       loader.remove();
       img.style.opacity = '1';
 
-      // 🔹 Reemplazar con la imagen grande cuando la pequeña ya cargó
+      // Reemplazar con la imagen grande cuando la pequeña ya cargó, pero con un pequeño retraso
       setTimeout(() => {
           img.src = imgUrl; // Carga la de alta calidad en segundo plano
       }, 100);
@@ -49,7 +49,7 @@ const preloadImage = (url) => {
   img.src = url; // Se carga en caché sin mostrarla
 };
 
-// Modificamos la función `renderImg`
+// Modifico la función `renderImg`
 const renderImg = (data) => {
   main.innerHTML = '';
 
@@ -76,7 +76,7 @@ const renderImg = (data) => {
           createModal(imgElement.dataset.full);
       });
 
-      // 🔹 Enlace al perfil del autor
+      // 🔹 Enlace al perfil del autor y evitar problemas con 'unsplash'
       const cardAuthor = document.createElement('a');
       cardAuthor.classList.add('author');
       cardAuthor.textContent = `Autor: ${img.user.username}`;
