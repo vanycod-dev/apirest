@@ -116,38 +116,35 @@ header {
     display: block;
 }
 
-/* Media Queries para móviles */
-@media screen and (max-width: 768px) {
+
+/* Móviles pequeños (primero mobile-first) */
+@media screen and (max-width: 480px) {
     .container-search {
         flex-direction: column;
-        gap: 0.5rem;
-        align-items: stretch;
     }
-
-    .buscador-input,
+    
+    .buscador-input, 
     .buscador-btn {
         width: 100%;
-        border-radius: var(--border-radius);
+        border-radius: 10px;
     }
-
+    
+    .buscador-btn {
+        margin-top: 8px;
+    }
+    
     .container-main {
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-        gap: 0.8rem;
+        grid-template-columns: 1fr;
     }
-
-    .history p {
-        padding: 0.5rem 1rem;
-        font-size: 0.9rem;
+    
+    .history {
+        padding: 10px 5px;
     }
 }
 
-/* Pantallas muy pequeñas (ej: < 400px) */
-@media screen and (max-width: 400px) {
+/* Tablets y móviles grandes */
+@media screen and (min-width: 481px) and (max-width: 768px) {
     .container-main {
-        grid-template-columns: 1fr; /* Una columna */
-    }
-
-    .tarjeta img {
-        height: 150px;
+        grid-template-columns: repeat(2, 1fr);
     }
 }
