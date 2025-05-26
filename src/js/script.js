@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const historyContainer = document.getElementById('search-history');
     const resultsContainer = document.getElementById('image-results');
     let searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
-    const UNSPLASH_API_KEY = 'jMBn4JdVYyIHAl4cKVZ7ICCtjtZmXHml5iEczZA7BkE'; // Reemplaza esto con tu key válida
 
     // Cargar historial al iniciar
     updateHistory();
@@ -25,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Buscar imágenes con API Key correcta
         try {
             const response = await fetch(
-                `https://api.unsplash.com/search/photos?query=${query}&client_id=${UNSPLASH_API_KEY}`
+                `https://api.unsplash.com/search/photos?query=${query}&client_id=jMBn4JdVYyIHAl4cKVZ7ICCtjtZmXHml5iEczZA7BkE`
             );
             
             if (!response.ok) {
