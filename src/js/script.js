@@ -1,3 +1,5 @@
+import { openGallery } from './modal.js';
+
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('search-form');
     const historyContainer = document.getElementById('search-history');
@@ -49,13 +51,25 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function displayImages(images) {
-        resultsContainer.innerHTML = images
-            .map(img => `
-                <div class="tarjeta">
-                    <img src="${img.urls.regular}" alt="${img.alt_description || query}">
-                </div>
-            `)
-            .join('');
+    resultsContainer.innerHTML = images
+        .map(img => `
+            <div class="tarjeta">
+                <img 
+                    src="${img.urls.regular}" 
+                    alt="${img.alt_description || 'Imagen de Unsplash'}"
+                    data-author="${img.user.name || 'Anónimo'}"
+                    data-full="${img.urls.full}"
+                >
+            </div>
+        `)
+        .join('');
+
+        // Evento click para abrir galería
+        document.querySelectorAll('.tarjeta img').forEach((img, index) => {
+            img.addEventListener('click', () => {
+                openGallery(images, index);
+            });
+        });
     }
 });
 

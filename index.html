@@ -21,6 +21,16 @@
         </section>
         <section class="container-main" id="image-results"></section>
     </main>
-    <script src="src/js/script.js" defer></script>
+    <!-- Modal para imagen ampliada -->
+    <div id="image-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <button id="prev-btn" class="nav-btn">&#10094;</button>
+            <img id="modal-image" src="" alt="Imagen ampliada">
+            <button id="next-btn" class="nav-btn">&#10095;</button>
+            <p id="author-name" class="author"></p>
+        </div>
+    </div>
+    <script type="module" src="src/js/script.js"></script>
 </body>
 </html>
