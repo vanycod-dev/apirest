@@ -1,126 +1,66 @@
-const search = document.querySelector('.buscador-input');
-const btn = document.querySelector('.buscador-btn');
-const main = document.getElementById('main');
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('search-form');
+    const historyContainer = document.getElementById('search-history');
+    const resultsContainer = document.getElementById('image-results');
+    let searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
+    const UNSPLASH_API_KEY = 'jMBn4JdVYyIHAl4cKVZ7ICCtjtZmXHml5iEczZA7BkE'; // Reemplaza esto con tu key válida
 
-const createModal = (imgUrl) => {
-  const modal = document.createElement('div');
-  modal.classList.add('modal');
+    // Cargar historial al iniciar
+    updateHistory();
 
-  const overlay = document.createElement('div');
-  overlay.classList.add('overlay');
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const query = e.target[0].value.trim();
+        if (!query) return;
 
-  // Loader
-  const loader = document.createElement('div');
-  loader.className = 'modal-loader';
-  loader.innerHTML = '🌌';
-
-  // Imagen del modal (comienza con una más liviana)
-  const img = new Image();
-  img.src = imgUrl.replace('&w=1080', '&w=400'); // 🔹 Carga primero versión pequeña
-  img.classList.add('modal-img');
-  img.style.opacity = '0';
-
-  img.onload = () => {
-      loader.remove();
-      img.style.opacity = '1';
-
-      // Reemplazar con la imagen grande cuando la pequeña ya cargó, pero con un pequeño retraso
-      setTimeout(() => {
-          img.src = imgUrl; // Carga la de alta calidad en segundo plano
-      }, 100);
-  };
-
-  img.onerror = () => {
-      modal.innerHTML = '❌ Error al cargar la imagen';
-      console.error("Error al cargar:", img.src);
-  };
-
-  modal.append(loader, img);
-  document.body.append(modal, overlay);
-
-  overlay.addEventListener('click', () => {
-      modal.remove();
-      overlay.remove();
-  });
-};
-
-const preloadImage = (url) => {
-  const img = new Image();
-  img.src = url; // Se carga en caché sin mostrarla
-};
-
-// Modifico la función `renderImg`
-const renderImg = (data) => {
-  main.innerHTML = '';
-
-  const fragment = document.createDocumentFragment();
-  data.forEach((img) => {
-      const card = document.createElement('div');
-      card.classList.add('card');
-
-      const imgElement = document.createElement('img');
-      imgElement.style.opacity = '0';
-      imgElement.onload = () => {
-          imgElement.style.opacity = '1';
-      };
-      imgElement.src = img.urls?.thumb || '';
-      imgElement.dataset.full = img.urls?.full || '';
-
-      imgElement.addEventListener('mouseenter', () => {
-          preloadImage(imgElement.dataset.full);
-      });
-
-      imgElement.alt = img.alt_description || 'Imagen sin descripción';
-
-      imgElement.addEventListener('click', () => {
-          createModal(imgElement.dataset.full);
-      });
-
-      // 🔹 Enlace al perfil del autor y evitar problemas con 'unsplash'
-      const cardAuthor = document.createElement('a');
-      cardAuthor.classList.add('author');
-      cardAuthor.textContent = `Autor: ${img.user.username}`;
-      cardAuthor.href = img.user.links.html; // 🔗 Link al perfil de Unsplash
-      cardAuthor.target = '_blank'; // Para abrir en nueva pestaña
-      cardAuthor.rel = 'noopener noreferrer'; // Seguridad
-
-      card.append(imgElement, cardAuthor);
-      fragment.append(card);
-  });
-
-  main.appendChild(fragment);
-};
-
-
-const getImages = async (query) => {
-    main.innerHTML = '<div class="spine">🔄 Cargando...</div>';
-
-    try {
-        const response = await fetch(`https://api.unsplash.com/search/photos?query=${query}&per_page=10&page=1&client_id=jMBn4JdVYyIHAl4cKVZ7ICCtjtZmXHml5iEczZA7BkE`);
-
-        if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
-
-        const data = await response.json();
-        if (data.results.length === 0) {
-            main.innerHTML = `<div class="no-results">No encontramos resultados para "${query}"</div>`;
-        } else {
-            renderImg(data.results);
+        // Guardar en historial
+        if (!searchHistory.includes(query)) {
+            searchHistory.push(query);
+            localStorage.setItem('searchHistory', JSON.stringify(searchHistory));
+            updateHistory();
         }
-    } catch (error) {
-        main.innerHTML = `<div class="error-message">⚠️ Ocurrió un error. Intenta nuevamente.</div>`;
-        console.error(error);
+
+        // Buscar imágenes con API Key correcta
+        try {
+            const response = await fetch(
+                `https://api.unsplash.com/search/photos?query=${query}&client_id=${UNSPLASH_API_KEY}`
+            );
+            
+            if (!response.ok) {
+                throw new Error(`Error de API: ${response.status}`);
+            }
+
+            const data = await response.json();
+            if (data.results && data.results.length > 0) {
+                displayImages(data.results);
+            } else {
+                resultsContainer.innerHTML = "<p>No se encontraron imágenes.</p>";
+            }
+        } catch (error) {
+            console.error("Error fetching images:", error);
+            resultsContainer.innerHTML = `<p>Error al cargar imágenes: ${error.message}</p>`;
+        }
+    });
+
+    function updateHistory() {
+        historyContainer.innerHTML = searchHistory
+            .map(term => `<p onclick="searchAgain('${term}')">${term}</p>`)
+            .join('');
     }
+
+    function displayImages(images) {
+        resultsContainer.innerHTML = images
+            .map(img => `
+                <div class="tarjeta">
+                    <img src="${img.urls.regular}" alt="${img.alt_description || query}">
+                </div>
+            `)
+            .join('');
+    }
+});
+
+// Función global para re-buscar desde historial
+window.searchAgain = (term) => {
+    document.querySelector('.buscador-input').value = term;
+    document.getElementById('search-form').dispatchEvent(new Event('submit'));
 };
-
-btn.addEventListener('click', () => {
-    const query = search.value.trim();
-    if (query.length < 3) {
-        main.innerHTML = `<div class="error-message">Ingresa al menos 3 caracteres</div>`;
-        return;
-    }
-    getImages(query.replace(/\s+/g, '+'));
-});
-
-search.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') btn.click();
-});

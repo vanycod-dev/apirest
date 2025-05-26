@@ -1,34 +1,24 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Buscador Api Img</title>
-    <link rel="stylesheet" href="node_modules/normalize.css/normalize.css">
+    <meta name="description" content="Buscador de imágenes gratuitas usando Unsplash">
     <link rel="stylesheet" href="src/css/stile.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
 </head>
 <body>
     <header>
         <h1>Buscador de Imágenes Unsplash</h1>
-        <div class="container-search">
-            <input type="text" class="buscador-input" placeholder="Buscar Imagen" aria-label="Buscar Imagen">
-            <button type="submit" class="buscador-btn" aria-label="botton para buscar imagenes">Buscar</button>
-        </div>
+        <form class="container-search" id="search-form">
+            <input type="text" class="buscador-input" placeholder="Buscar Imagen" aria-label="Buscar Imagen" required>
+            <button type="submit" class="buscador-btn">Buscar</button>
+        </form>
     </header>
     <main id="main">
-        <div class="container">
-            <div class="continer-history">
-                <p>gatos</p>
-                <p>gatos</p>
-                <p>gatos</p>
-                <p>gatos</p>
-                <p>gatos</p>
-                <p>gatos</p>
-            </div>
-        </div>
-        En proceso de mejora posiblemente no funcione..
-        <div class="spine"></div>
+        <section class="container-history">
+            <div class="history" id="search-history"></div>
+        </section>
+        <section class="container-main" id="image-results"></section>
     </main>
-    <script src="src/js/script.js"></script>
+    <script src="src/js/script.js" defer></script>
 </body>
 </html>
