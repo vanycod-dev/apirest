@@ -4,10 +4,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('search-form');
     const historyContainer = document.getElementById('search-history');
     const resultsContainer = document.getElementById('image-results');
+    const btnClearHistory = document.querySelector('.btn-delet'); // Corregido el selector
     let searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
 
     // Cargar historial al iniciar
     updateHistory();
+
+    // Evento para eliminar historial
+    btnClearHistory.addEventListener('click', deleteHistory);
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -21,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
             updateHistory();
         }
 
-        // Buscar imágenes con API Key correcta
+        // Buscar imágenes
         try {
             const response = await fetch(
                 `https://api.unsplash.com/search/photos?query=${query}&client_id=jMBn4JdVYyIHAl4cKVZ7ICCtjtZmXHml5iEczZA7BkE`
@@ -45,23 +49,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateHistory() {
         historyContainer.innerHTML = searchHistory
-            .map(term => `<p onclick="searchAgain('${term}')">${term}</p>`)
+            .map(term => `<p>${term}</p>`)
             .join('');
+        
+        // Asignar eventos a los nuevos elementos del historial
+        document.querySelectorAll('#search-history p').forEach(p => {
+            p.addEventListener('click', () => {
+                const term = p.textContent;
+                document.querySelector('.buscador-input').value = term;
+                form.dispatchEvent(new Event('submit'));
+            });
+        });
+    }
+
+    function deleteHistory() {
+        searchHistory = [];
+        localStorage.removeItem('searchHistory');
+        updateHistory();
+        resultsContainer.innerHTML = '';
     }
 
     function displayImages(images) {
-    resultsContainer.innerHTML = images
-        .map(img => `
-            <div class="tarjeta">
-                <img 
-                    src="${img.urls.regular}" 
-                    alt="${img.alt_description || 'Imagen de Unsplash'}"
-                    data-author="${img.user.name || 'Anónimo'}"
-                    data-full="${img.urls.full}"
-                >
-            </div>
-        `)
-        .join('');
+        resultsContainer.innerHTML = images
+            .map(img => `
+                <div class="tarjeta">
+                    <img 
+                        src="${img.urls.regular}" 
+                        alt="${img.alt_description || 'Imagen de Unsplash'}"
+                        data-author="${img.user.name || 'Anónimo'}"
+                        data-full="${img.urls.full}"
+                    >
+                </div>
+            `)
+            .join('');
 
         // Evento click para abrir galería
         document.querySelectorAll('.tarjeta img').forEach((img, index) => {
@@ -71,9 +91,3 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
-
-// Función global para re-buscar desde historial
-window.searchAgain = (term) => {
-    document.querySelector('.buscador-input').value = term;
-    document.getElementById('search-form').dispatchEvent(new Event('submit'));
-};
